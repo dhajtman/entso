@@ -42,6 +42,16 @@ Download data source via REST API preferably: `https://transparency.entsoe.eu/ge
 Feel free to make reasonable assumptions about any aspects not explicitly defined in the requirements. You may choose any programming language supported by AWS Lambda. Document any assumptions or design decisions in your submission.
 API documentation available here https://transparency.entsoe.eu/content/static_content/Static%20content/knowledge%20base/knowledge%20base.html
 
+## Setup
+1. **Create terraform.tfvars file with values:**:
+    ```
+   api_url       = "https://web-api.tp.entsoe.eu/api?documentType=A71&processType=A01&in_Domain=10YBE----------2&periodStart=202308152200&periodEnd=202308162200&securityToken="
+   s3_bucket     = "entsoe-data-buckets"
+   countries     = ["DE", "FR", "IT"]
+   output_prefix = "entsoe-data"
+   api_url_token = "entsoe web api token"    
+   ```
+
 ## Terraform  
 1. **Check AWS region**: 
     ```bash
