@@ -34,6 +34,12 @@ variable "period_end" {
   default = "202308162200" # Replace with your actual end period
 }
 
+variable "snap_start_value" {
+  description = "The value for the snap_start apply_on parameter"
+  type        = string
+  default     = "None" # Default value, can be changed to "PublishedVersions" if needed
+}
+
 variable "schedule_expression" {
   description = "The schedule expression for the CloudWatch Event Rule"
   type        = string

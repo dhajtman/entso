@@ -77,9 +77,7 @@ resource "aws_lambda_function" "entsoe_scraper" {
   timeout       = 60
 
   snap_start {
-    # apply_on = "PublishedVersions"
-    apply_on = "None"
-
+    apply_on = var.snap_start_value
   }
 
   # VPC configuration
