@@ -46,6 +46,12 @@ variable "schedule_expression" {
   default     = "rate(1 day)" # Default value
 }
 
+variable "secret_token_name" {
+  type        = string
+  description = "The name of the secret in AWS Secrets Manager"
+  default = "entsoe_api_token" # # Unique name for the secret, may required to be changed after deletion since recovery window is 7 days
+}
+
 variable "s3_bucket" {
   type        = string
   description = "The S3 bucket name for storing data"

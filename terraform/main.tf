@@ -105,7 +105,7 @@ resource "aws_lambda_function" "entsoe_scraper" {
 
 # Create a Secrets Manager secret
 resource "aws_secretsmanager_secret" "api_token" {
-  name        = "entsoe_api_token2" # Unique name for the secret, may required to be changed after deletion since recovery window is 7 days
+  name        = var.secret_token_name # Unique name for the secret, may required to be changed after deletion since recovery window is 7 days
   description = "API token for accessing the ENTSOE API"
 }
 
