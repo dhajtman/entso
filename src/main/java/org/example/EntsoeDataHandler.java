@@ -36,21 +36,24 @@ public class EntsoeDataHandler implements RequestHandler<Object, String> {
 
         try {
             // Access environment variables
-            String apiUrl = System.getenv().getOrDefault("API_URL",
-                    "https://web-api.tp.entsoe.eu/api?documentType=A71&processType=A01&in_Domain=10YBE----------2&periodStart=202308152200&periodEnd=202308162200&securityToken=90765852-0497-41e0-b46f-8b0f49c57ca0");
+            String apiUrlTemplate = System.getenv().getOrDefault("API_URL",
+                    "https://web-api.tp.entsoe.eu/api?documentType={document_type}&processType={process_type}&in_Domain={in_domain}&periodStart={period_start}&periodEnd={period_end}&securityToken={api_url_token}");
+            String apiUrlToken = System.getenv().getOrDefault("API_URL_TOKEN", "xxxxxx");
+            String documentType = System.getenv().getOrDefault("DOCUMENT_TYPE", "A71");
+            String processType = System.getenv().getOrDefault("PROCESS_TYPE", "A01");
+            String inDomain = System.getenv().getOrDefault("IN_DOMAIN", "10YBE----------2");
+            String periodStart = System.getenv().getOrDefault("PERIOD_START", "202308152200");
+            String periodEnd = System.getenv().getOrDefault("PERIOD_END", "202308162200");
+
             String bucketName = System.getenv().getOrDefault("S3_BUCKET", "entsoe-data-bucket");
-            String countries = System.getenv().getOrDefault("COUNTRIES", "DE,FR,IT");
             String outputPrefix = System.getenv().getOrDefault("OUTPUT_PREFIX", "entsoe_data_");
 
-            if (apiUrl == null || bucketName == null || countries == null) {
-                logger.log("Required environment variables are not set", LogLevel.ERROR);
-                throw new IllegalArgumentException("Required environment variables are not set");
-            }
+            String apiUrl = assembleApiUrl(apiUrlTemplate, documentType, processType, inDomain, periodStart, periodEnd, apiUrlToken);
 
             logger.log("Going to fetch data from API URL: " + apiUrl);
 
             // Fetch data from the API
-            String responseData = fetchDataFromApi(apiUrl, countries);
+            String responseData = fetchDataFromApi(apiUrl);
             logger.log("Got response: " + responseData);
 
             // Process the data dynamically
@@ -74,7 +77,16 @@ public class EntsoeDataHandler implements RequestHandler<Object, String> {
         }
     }
 
-    private String fetchDataFromApi(String apiUrl, String countries) throws Exception {
+    private String assembleApiUrl(String apiUrl, String documentType, String processType, String inDomain, String periodStart, String periodEnd, String apiUrlToken) {
+        return apiUrl.replace("{document_type}", documentType)
+                .replace("{process_type}", processType)
+                .replace("{in_domain}", inDomain)
+                .replace("{period_start}", periodStart)
+                .replace("{period_end}", periodEnd)
+                .replace("{api_url_token}", apiUrlToken);
+    }
+
+    private String fetchDataFromApi(String apiUrl) throws Exception {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(apiUrl))

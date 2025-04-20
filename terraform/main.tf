@@ -76,6 +76,12 @@ resource "aws_lambda_function" "entsoe_scraper" {
   filename      = "../target/entso-1.0-SNAPSHOT.jar"
   timeout       = 60
 
+  snap_start {
+    # apply_on = "PublishedVersions"
+    apply_on = "None"
+
+  }
+
   # VPC configuration
   vpc_config {
     subnet_ids         = [aws_subnet.private.id] # Reference the private subnet
@@ -85,9 +91,14 @@ resource "aws_lambda_function" "entsoe_scraper" {
   # Environment variables
   environment {
     variables = {
-      API_URL           = "${var.api_url}${jsondecode(data.aws_secretsmanager_secret_version.api_token.secret_string).api_url_token}"
+      API_URL           = var.api_url
+      API_URL_TOKEN     = jsondecode(data.aws_secretsmanager_secret_version.api_token.secret_string).api_url_token
+      DOCUMENT_TYPE     = var.document_type
+      PROCESS_TYPE      = var.process_type
+      IN_DOMAIN         = var.in_domain
+      PERIOD_START      = var.period_start
+      PERIOD_END        = var.period_end
       S3_BUCKET         = aws_s3_bucket.entsoe_data.bucket
-      COUNTRIES         = jsonencode(var.countries)
       OUTPUT_PREFIX     = var.output_prefix
       # JAVA_TOOL_OPTIONS = "-Djdk.internal.httpclient.debug=true"
     }
@@ -96,7 +107,7 @@ resource "aws_lambda_function" "entsoe_scraper" {
 
 # Create a Secrets Manager secret
 resource "aws_secretsmanager_secret" "api_token" {
-  name        = "entsoe_api_token"
+  name        = "entsoe_api_token2" # Unique name for the secret, may required to be changed after deletion since recovery window is 7 days
   description = "API token for accessing the ENTSOE API"
 }
 
@@ -111,6 +122,9 @@ resource "aws_secretsmanager_secret_version" "api_token_version" {
 # Retrieve the API token from Secrets Manager
 data "aws_secretsmanager_secret_version" "api_token" {
   secret_id = aws_secretsmanager_secret.api_token.id
+
+  # Ensure the secret version is created before this data block is executed
+  depends_on = [aws_secretsmanager_secret_version.api_token_version]
 }
 
 # IAM Policy for accessing Secrets Manager
@@ -221,7 +235,7 @@ resource "aws_security_group" "lambda_sg" {
 # Create EventRule to trigger Lambda function
 resource "aws_cloudwatch_event_rule" "schedule" {
   name                = "entsoe-scraper-schedule"
-  schedule_expression = "rate(30 minutes)"
+  schedule_expression = var.schedule_expression
 }
 
 # Create Event Target to invoke Lambda function

@@ -42,14 +42,22 @@ Download data source via REST API preferably: `https://transparency.entsoe.eu/ge
 Feel free to make reasonable assumptions about any aspects not explicitly defined in the requirements. You may choose any programming language supported by AWS Lambda. Document any assumptions or design decisions in your submission.
 API documentation available here https://transparency.entsoe.eu/content/static_content/Static%20content/knowledge%20base/knowledge%20base.html
 
+## ENTSOE API parameter list
+https://transparencyplatform.zendesk.com/hc/en-us/articles/15692855254548-Sitemap-for-Restful-API-Integration
+
 ## Setup
 1. **Create terraform.tfvars file with values:**:
     ```
-   api_url       = "https://web-api.tp.entsoe.eu/api?documentType=A71&processType=A01&in_Domain=10YBE----------2&periodStart=202308152200&periodEnd=202308162200&securityToken="
+   api_url       = "https://web-api.tp.entsoe.eu/api?documentType={document_type}&processType={process_type}&in_Domain={in_domain}&periodStart={period_start}&periodEnd={period_end}&securityToken={api_url_token}"
+   document_type = "A71" # Generation forecast
+   process_type  = "A01" # Day ahead
+   in_domain     = "10YBE----------2" # Control Area, Bidding Zone, Country
+   period_start  = "202308152200" # Start period (Pattern yyyyMMddHHmm e.g. 201601010000)
+   period_end    = "202308162200" # End period (Pattern yyyyMMddHHmm e.g. 201601010000)
+   schedule_expression = "rate(1 day)" # Default value
    s3_bucket     = "entsoe-data-buckets"
-   countries     = ["DE", "FR", "IT"]
    output_prefix = "entsoe-data"
-   api_url_token = "entsoe web api token"    
+   api_url_token = "your_api_token" # Token from transparency.entsoe.eu
    ```
 
 ## Terraform  
