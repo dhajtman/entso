@@ -38,7 +38,7 @@ public class EntsoeDataHandler implements RequestHandler<Object, String> {
             // Access environment variables
             String apiUrlTemplate = System.getenv().getOrDefault("API_URL",
                     "https://web-api.tp.entsoe.eu/api?documentType={document_type}&processType={process_type}&in_Domain={in_domain}&periodStart={period_start}&periodEnd={period_end}&securityToken={api_url_token}");
-            String apiUrlToken = System.getenv().getOrDefault("API_URL_TOKEN", "90765852-0497-41e0-b46f-8b0f49c57ca0");
+            String apiUrlToken = System.getenv().getOrDefault("API_URL_TOKEN", "xxxxxx");
             String documentType = System.getenv().getOrDefault("DOCUMENT_TYPE", "A75");
             String processType = System.getenv().getOrDefault("PROCESS_TYPE", "A16");
             String inDomain = System.getenv().getOrDefault("IN_DOMAIN", "10Y1001A1001A83F");
