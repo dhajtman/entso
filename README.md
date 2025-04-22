@@ -38,8 +38,7 @@ https://transparencyplatform.zendesk.com/hc/en-us/articles/15692855254548-Sitema
     ```
 5. **Apply Terraform configuration**:
     ```bash
-    terraform apply
-    terraform apply -var-file=terraform_A71.tfvars # specific .tfvars file
+    terraform apply -var-file=terraform_A75.tfvars # specific .tfvars file
     ```
 6. **List all deployed resources**:
     ```bash
@@ -47,7 +46,7 @@ https://transparencyplatform.zendesk.com/hc/en-us/articles/15692855254548-Sitema
     ```
 7. **Destroy all resources**:
     ```bash
-    terraform destroy
+    terraform destroy -var-file=terraform_A75.tfvars
     ```
 8. **Update only Lambda jar**:
     ```bash
