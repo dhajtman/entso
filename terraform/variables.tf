@@ -1,4 +1,10 @@
-variable "api_url" {
+variable "aws_region" {
+  description = "AWS region to deploy resources"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "entsoe_api_url" {
   type        = string
   description = "The API URL for the ENTSOE scraper"
   default = "https://web-api.tp.entsoe.eu/api?documentType={document_type}&processType={process_type}&in_Domain={in_domain}&periodStart={period_start}&periodEnd={period_end}&securityToken={api_url_token}"
@@ -34,6 +40,12 @@ variable "period_end" {
   default = "202308162200" # Replace with your actual end period
 }
 
+variable "target_key" {
+  type        = string
+  description = "The target key to parse ENTSOE API response"
+  default = "quantity" # Replace with your actual target key
+}
+
 variable "snap_start_value" {
   description = "The value for the snap_start apply_on parameter"
   type        = string
@@ -52,7 +64,7 @@ variable "secret_token_name" {
   default = "entsoe_api_token" # # Unique name for the secret, may required to be changed after deletion since recovery window is 7 days
 }
 
-variable "s3_bucket" {
+variable "s3_bucket_name" {
   type        = string
   description = "The S3 bucket name for storing data"
   default = "entsoe-data-bucket" # Replace with your actual bucket name
@@ -64,7 +76,7 @@ variable "output_prefix" {
   default = "entsoe-data" # Replace with your actual output prefix
 }
 
-variable "api_url_token" {
+variable "entsoe_api_url_token" {
   type        = string
   description = "Token for accessing the ENTSOE API"
   sensitive   = true

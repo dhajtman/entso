@@ -14,9 +14,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Lambda handler for scraping ENTSO-E data and storing it in S3.
@@ -38,15 +38,16 @@ public class EntsoeDataHandler implements RequestHandler<Object, String> {
             // Access environment variables
             String apiUrlTemplate = System.getenv().getOrDefault("API_URL",
                     "https://web-api.tp.entsoe.eu/api?documentType={document_type}&processType={process_type}&in_Domain={in_domain}&periodStart={period_start}&periodEnd={period_end}&securityToken={api_url_token}");
-            String apiUrlToken = System.getenv().getOrDefault("API_URL_TOKEN", "xxxxxx");
-            String documentType = System.getenv().getOrDefault("DOCUMENT_TYPE", "A71");
-            String processType = System.getenv().getOrDefault("PROCESS_TYPE", "A01");
-            String inDomain = System.getenv().getOrDefault("IN_DOMAIN", "10YBE----------2");
+            String apiUrlToken = System.getenv().getOrDefault("API_URL_TOKEN", "90765852-0497-41e0-b46f-8b0f49c57ca0");
+            String documentType = System.getenv().getOrDefault("DOCUMENT_TYPE", "A75");
+            String processType = System.getenv().getOrDefault("PROCESS_TYPE", "A16");
+            String inDomain = System.getenv().getOrDefault("IN_DOMAIN", "10Y1001A1001A83F");
             String periodStart = System.getenv().getOrDefault("PERIOD_START", "202308152200");
             String periodEnd = System.getenv().getOrDefault("PERIOD_END", "202308162200");
+            String targetKey = System.getenv().getOrDefault("TARGET_KEY", "quantity");
 
-            String bucketName = System.getenv().getOrDefault("S3_BUCKET", "entsoe-data-bucket");
-            String outputPrefix = System.getenv().getOrDefault("OUTPUT_PREFIX", "entsoe_data_");
+            String bucketName = System.getenv().getOrDefault("S3_BUCKET", "entsoe-data-buckets");
+            String outputPrefix = System.getenv().getOrDefault("OUTPUT_PREFIX", "entsoe-data");
 
             String apiUrl = assembleApiUrl(apiUrlTemplate, documentType, processType, inDomain, periodStart, periodEnd, apiUrlToken);
 
@@ -57,7 +58,7 @@ public class EntsoeDataHandler implements RequestHandler<Object, String> {
             logger.log("Got response: " + responseData);
 
             // Process the data dynamically
-            List<String> processedData = processData(responseData);
+            List<String> processedData = processData(responseData, targetKey);
             logger.log("Processed data: " + processedData);
 
             // Convert the data to CSV format
@@ -101,16 +102,31 @@ public class EntsoeDataHandler implements RequestHandler<Object, String> {
         return response.body();
     }
 
-    private List<String> processData(String xmlData) throws Exception {
+    public List<String> processData(String xmlData, String targetKey) throws Exception {
         XmlMapper xmlMapper = new XmlMapper();
         Map<String, Object> root = xmlMapper.readValue(xmlData, Map.class);
 
-        // Extract relevant data dynamically using streams
-        return ((List<Map<String, String>>) ((Map<String, Object>) ((Map<String, Object>) root.get("TimeSeries"))
-                .get("Period")).get("Point"))
-                .stream()
-                .map(point -> point.get("quantity"))
-                .collect(Collectors.toList());
+        List<String> extractedValues = new ArrayList<>();
+        extractValues(root, targetKey, extractedValues);
+        return extractedValues;
+    }
+
+    private void extractValues(Object node, String targetKey, List<String> extractedValues) {
+        if (node instanceof Map) {
+            Map<String, Object> mapNode = (Map<String, Object>) node;
+            for (Map.Entry<String, Object> entry : mapNode.entrySet()) {
+                if (entry.getKey().equals(targetKey)) {
+                    extractedValues.add(entry.getValue().toString());
+                } else {
+                    extractValues(entry.getValue(), targetKey, extractedValues);
+                }
+            }
+        } else if (node instanceof List) {
+            List<Object> listNode = (List<Object>) node;
+            for (Object item : listNode) {
+                extractValues(item, targetKey, extractedValues);
+            }
+        }
     }
 
     private void uploadToS3(String bucketName, String key, String data) {

@@ -17,4 +17,4 @@ target/
 
 ### TerraForm ###
 terraform/.terraform/
-terraform/terraform.tfvars
+terraform/*.tfvars
