@@ -9,7 +9,7 @@ resource "aws_lambda_function" "entsoe_scraper" {
   filename      = var.filename
   timeout       = var.timeout
   architectures = var.architectures
-  memory_size   = "256"
+  memory_size   = var.memory_size
 
   snap_start {
     apply_on = var.snap_start_value
