@@ -4,15 +4,15 @@
 resource "aws_lambda_function" "entsoe_scraper" {
   function_name = "entsoe-scraper"
   role          = aws_iam_role.lambda_role.arn
-  handler       = "org.example.EntsoeDataHandler::handleRequest"
-  runtime       = "java21"
-  filename      = "../target/entso-1.0-SNAPSHOT.jar"
-  timeout       = 60
+  handler       = var.handler
+  runtime       = var.runtime
+  filename      = var.filename
+  timeout       = var.timeout
+  architectures = var.architectures
   memory_size   = "256"
 
   snap_start {
     apply_on = var.snap_start_value
-    # apply_on = "None" # Default value, can be changed to "PublishedVersions" if needed
   }
 
   vpc_config {

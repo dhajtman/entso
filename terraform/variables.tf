@@ -52,6 +52,36 @@ variable "snap_start_value" {
   default     = "None" # Default value, can be changed to "PublishedVersions" if needed
 }
 
+variable "handler" {
+  type        = string
+  description = "The handler for the Lambda function"
+  default     = "org.example.EntsoeDataHandler::handleRequest" # The entry point for the Lambda function
+}
+
+variable "runtime" {
+  type        = string
+  description = "The runtime for the Lambda function"
+  default     = "java21" # The runtime for the Lambda function
+}
+
+variable "architectures" {
+  type        = list(string)
+  description = "The architectures for the Lambda function"
+  default     = ["x86_64"] # Set the architecture
+}
+
+variable "filename" {
+  type        = string
+  description = "The path to the zipped Lambda function code"
+  default     = "../target/entso-1.0-SNAPSHOT.jar" # Path to the zipped Lambda function code
+}
+
+variable "timeout" {
+  type        = number
+  description = "The timeout for the Lambda function in seconds"
+  default     = 60 # Timeout in seconds
+}
+
 variable "schedule_expression" {
   description = "The schedule expression for the CloudWatch Event Rule"
   type        = string

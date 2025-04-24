@@ -52,3 +52,7 @@ https://transparencyplatform.zendesk.com/hc/en-us/articles/15692855254548-Sitema
     ```bash
     aws lambda update-function-code --function-name entsoe-scraper --zip-file fileb://../target/entso-1.0-SNAPSHOT.jar
     ```
+9. **If required, deleting ENI or you may need to wait**:
+   ```bash
+   aws ec2 delete-network-interface --network-interface-id eni-1234567890abcdef0
+   ```
