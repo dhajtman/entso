@@ -51,8 +51,6 @@ public class EntsoeDataHandler implements RequestHandler<Object, String> {
 
             String apiUrl = assembleApiUrl(apiUrlTemplate, documentType, processType, inDomain, periodStart, periodEnd, apiUrlToken);
 
-            logger.log("Going to fetch data from API URL: " + apiUrl);
-
             // Fetch data from the API
             String responseData = fetchDataFromApi(apiUrl);
             logger.log("Got response: " + responseData);
